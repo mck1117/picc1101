@@ -640,6 +640,10 @@ int main (int argc, char **argv)
     {
 		send_raw_pkt_test(&spi_parameters, &radio_parameters, &arguments);
     }
+    else if (arguments.test_mode == 3)
+    {
+        robot_controller(&spi_parameters, &radio_parameters, &arguments);
+    }
 
     delete_args(&arguments);
     return 0;
