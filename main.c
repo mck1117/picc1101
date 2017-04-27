@@ -97,10 +97,6 @@ static struct argp_option options[] = {
     {"test-phrase",  'y', "TEST_PHRASE", 0, "Set a test phrase to be used in test (default : \"Hello, World!\")"},
     {"repetition",  'n', "REPETITION", 0, "Repetiton factor wherever appropriate, see long Help (-H) option (default : 1 single)"},
     {"radio-status",  's', 0, 0, "Print radio status and exit"},
-    {"tnc-radio-window",  301, "RX_WINDOW_US", 0, "TNC time window in microseconds for concatenating radio frames. 0: no concatenation (default: 0))"},
-    {"tnc-keyup-delay",  302, "KEYUP_DELAY_US", 0, "TNC keyup delay in microseconds (default: 10ms). In KISS mode it can be changed live via kissparms."},
-    {"tnc-keydown-delay",  303, "KEYDOWN_DELAY_US", 0, "FUTUR USE: TNC keydown delay in microseconds (default: 0 inactive)"},
-    {"tnc-switchover-delay",  304, "SWITCHOVER_DELAY_US", 0, "FUTUR USE: TNC switchover delay in microseconds (default: 0 inactive)"},
     {0}
 };
 
@@ -173,11 +169,6 @@ static void init_args(arguments_t *arguments)
     arguments->fec = 0;
     arguments->whitening = 0;
     arguments->preamble = PREAMBLE_4;
-    arguments->tnc_serial_window = 40000;
-    arguments->tnc_radio_window = 0;
-    arguments->tnc_keyup_delay = 4000;
-    arguments->tnc_keydown_delay = 0;
-    arguments->tnc_switchover_delay = 0;
     arguments->real_time = 0;
 }
 
@@ -224,32 +215,6 @@ static void print_args(arguments_t *arguments)
         fprintf(stderr, "Test phrase .........: %s\n", arguments->test_phrase);
         fprintf(stderr, "Test repetition .....: %d times\n", arguments->repetition);
     }
-
-    fprintf(stderr, "--- serial ---\n");
-    fprintf(stderr, "TNC device ..........: %s\n", arguments->serial_device);
-    fprintf(stderr, "TNC speed ...........: %d Baud\n", arguments->serial_speed_n);
-
-    if (arguments->tnc_serial_window)
-    {
-        fprintf(stderr, "TNC serial window ...: %.2f ms\n", arguments->tnc_serial_window / 1000.0);
-    }
-    else
-    {
-        fprintf(stderr, "TNC serial window ...: none\n");   
-    }
-
-    if (arguments->tnc_radio_window)
-    {
-        fprintf(stderr, "TNC radio window ....: %.2f ms\n", arguments->tnc_radio_window / 1000.0);
-    }
-    else
-    {
-        fprintf(stderr, "TNC radio window ....: none\n");   
-    }
-
-    fprintf(stderr, "TNC keyup delay .....: %.2f ms\n", arguments->tnc_keyup_delay / 1000.0);
-    fprintf(stderr, "TNC keydown delay ...: %.2f ms\n", arguments->tnc_keydown_delay / 1000.0);
-    fprintf(stderr, "TNC switch delay ....: %.2f ms\n", arguments->tnc_switchover_delay / 1000.0);
 }
 
 // ------------------------------------------------------------------------------------------------
