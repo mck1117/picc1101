@@ -528,6 +528,51 @@ void send_raw_pkt_test(spi_parms_t* spi_parms, radio_parms_t* radio_parms, argum
 	}
 }
 
+void robot_controller(spi_parms_t* spi_parms, radio_parms_t* radio_parms, arguments_t* arguments)
+{    
+    FILE* serialport = fopen("/dev/ttyAMA0", "r");
+
+    char buf[1024];
+    int idx = 0;
+
+    while(1)
+    {
+        int x = fgetc(serialport);
+
+        if(x == -1) continue;
+
+        buf[idx] = (char)x;
+
+        if(buf[idx] == '\r')
+        {
+            idx = 0;
+
+            union {
+                struct {
+                    float x1, y1, x2, y2;
+                } s1;
+
+                char arr[16];
+            } u;
+
+            sscanf(buf, "%f %f %f %f\r", &u.s1.x1, &u.s1.y1, &u.s1.x2, &u.s1.y2);
+
+            printf("%.2f %.2f\r\n", u.s1.x1, u.s1.y1);
+
+            radio_wait_free();
+            radio_send_packet_raw(spi_parms, u.arr, 8);
+
+            fprintf(stderr, "send done\n\n");
+
+            radio_wait_a_bit(4);
+        }
+        else
+        {
+            idx++;
+        }
+
+    }
+}
 
 // ------------------------------------------------------------------------------------------------
 int main (int argc, char **argv)
