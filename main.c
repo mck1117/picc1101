@@ -15,12 +15,10 @@
 
 #include "main.h"
 #include "util.h"
-#include "serial.h"
 #include "pi_cc_spi.h"
 #include "radio.h"
 
 arguments_t   arguments;
-serial_t      serial_parameters;
 spi_parms_t   spi_parameters;
 radio_parms_t radio_parameters;
 
@@ -99,9 +97,6 @@ static struct argp_option options[] = {
     {"test-phrase",  'y', "TEST_PHRASE", 0, "Set a test phrase to be used in test (default : \"Hello, World!\")"},
     {"repetition",  'n', "REPETITION", 0, "Repetiton factor wherever appropriate, see long Help (-H) option (default : 1 single)"},
     {"radio-status",  's', 0, 0, "Print radio status and exit"},
-    {"tnc-serial-device",  'D', "SERIAL_DEVICE", 0, "TNC Serial device, (default : /var/ax25/axp2)"},
-    {"tnc-serial-speed",  'B', "SERIAL_SPEED", 0, "TNC Serial speed in Bauds (default : 9600)"},
-    {"tnc-serial-window",  300, "TX_WINDOW_US", 0, "TNC time window in microseconds for concatenating serial frames. 0: no concatenation (default: 40ms))"},
     {"tnc-radio-window",  301, "RX_WINDOW_US", 0, "TNC time window in microseconds for concatenating radio frames. 0: no concatenation (default: 0))"},
     {"tnc-keyup-delay",  302, "KEYUP_DELAY_US", 0, "TNC keyup delay in microseconds (default: 10ms). In KISS mode it can be changed live via kissparms."},
     {"tnc-keydown-delay",  303, "KEYDOWN_DELAY_US", 0, "FUTUR USE: TNC keydown delay in microseconds (default: 0 inactive)"},
@@ -162,9 +157,6 @@ static void init_args(arguments_t *arguments)
 {
     arguments->verbose_level = 0;
     arguments->print_long_help = 0;
-    arguments->serial_device = 0;
-    arguments->serial_speed = B38400;
-    arguments->serial_speed_n = 38400;
     arguments->spi_device = 0;
     arguments->print_radio_status = 0;
     arguments->modulation = MOD_FSK2;
@@ -194,10 +186,6 @@ static void init_args(arguments_t *arguments)
 void delete_args(arguments_t *arguments)
 // ------------------------------------------------------------------------------------------------
 {
-    if (arguments->serial_device)
-    {
-        free(arguments->serial_device);
-    }
     if (arguments->spi_device)
     {
         free(arguments->spi_device);
@@ -414,18 +402,6 @@ static error_t parse_opt (int key, char *arg, struct argp_state *state)
             if (*end)
                 argp_usage(state);
             break; 
-        // Serial device
-        case 'D':
-            arguments->serial_device = strdup(arg);
-            break;
-        // Serial speed  
-        case 'B':
-            i32 = strtol(arg, &end, 10); 
-            if (*end)
-                argp_usage(state);
-            else
-                arguments->serial_speed = get_serial_speed(i32, &(arguments->serial_speed_n));
-            break;
         // SPI device
         case 'd':
             arguments->spi_device = strdup(arg);
@@ -530,10 +506,6 @@ int main (int argc, char **argv)
         return 0;
     }
     
-    if (!arguments.serial_device)
-    {
-        arguments.serial_device = strdup("/var/ax25/axp2");
-    }
     if (!arguments.spi_device)
     {
         arguments.spi_device = strdup("/dev/spidev0.0");
