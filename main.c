@@ -587,40 +587,11 @@ int main (int argc, char **argv)
         return ret;
     }
 
-    if (arguments.print_radio_status)
-    {
-        fprintf(stderr, "\n--- Radio state ---\n");
-        print_radio_status(&spi_parameters);
-    }
-    else if (arguments.test_mode == TEST_TX_SIMPLE)
-    {
-        radio_transmit_test(&spi_parameters, &arguments);
-    }
-    else if (arguments.test_mode == TEST_TX_INTERRUPT)
-    {
-        radio_transmit_test_int(&spi_parameters, &arguments);
-    }
-    else if (arguments.test_mode == TEST_RX_SIMPLE)
-    {
-        radio_receive_test(&spi_parameters, &arguments);
-    }
-    else if (arguments.test_mode == TEST_RX_INTERRUPT)
-    {
-        radio_receive_test_int(&spi_parameters, &arguments);
-    }
-    else if (arguments.test_mode == TEST_TX_ECHO)
-    {
-        radio_test_echo(&spi_parameters, &radio_parameters, &arguments, 1);
-    }
-    else if (arguments.test_mode == TEST_RX_ECHO)
-    {
-        radio_test_echo(&spi_parameters, &radio_parameters, &arguments, 0);
-    }
-    else if (arguments.test_mode == 7)
+    if (arguments.test_mode == 1)
     {
         stdout_print(&spi_parameters, &radio_parameters, &arguments);
     }
-    else if (arguments.test_mode == 8)
+    else if (arguments.test_mode == 2)
     {
 		send_raw_pkt_test(&spi_parameters, &radio_parameters, &arguments);
     }
