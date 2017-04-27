@@ -136,4 +136,7 @@ void     radio_wait_free();
 void     radio_send_packet(spi_parms_t *spi_parms, arguments_t *arguments, uint8_t *packet, uint32_t size);
 uint32_t radio_receive_packet(spi_parms_t *spi_parms, arguments_t *arguments, uint8_t *packet);
 
+void radio_send_packet_raw(spi_parms_t* spi_parms, uint8_t* packet, uint8_t size);
+uint8_t radio_receive_packet_raw(spi_parms_t* spi_parms, uint8_t* packet);
+
 #endif

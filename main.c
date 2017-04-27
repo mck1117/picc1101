@@ -465,6 +465,70 @@ static struct argp argp = {options, parse_opt, args_doc, doc};
 
 /***** ARGP configuration stop *****/
 
+
+void stdout_print(spi_parms_t* spi_parms, radio_parms_t* radio_parms, arguments_t* arguments)
+{
+	fprintf(stderr, "stdout_print starting \n");
+
+	uint8_t bytecount, rtx_bytes[256];
+
+	init_radio_int(spi_parms, arguments);
+	radio_flush_fifos(spi_parms);
+
+
+	while (1)
+	{
+		radio_init_rx(spi_parms, arguments);
+		radio_turn_rx(spi_parms);
+
+		do
+		{
+			radio_wait_free();
+			bytecount = radio_receive_packet_raw(spi_parms, rtx_bytes);
+			//bytecount = radio_receive_packet(spi_parms, arguments, rtx_bytes);
+
+			radio_wait_a_bit(4);
+		} while (bytecount == 0);
+
+		int i;
+
+		fprintf(stderr, "packet of %d bytes:", bytecount);
+
+		for (i = 0; i < bytecount; i++)
+		{
+			fprintf(stderr, " %02x", rtx_bytes[i]);
+		}
+
+		fprintf(stderr, "\n");
+	}
+}
+
+void send_raw_pkt_test(spi_parms_t* spi_parms, radio_parms_t* radio_parms, arguments_t* arguments)
+{
+	char foo[16];
+
+	size_t i;
+
+	for (i = 0; i < 16; i++)
+	{
+		foo[i] = i << 4 | i;
+	}
+
+	while (1)
+	{
+		fprintf(stderr, "send\n");
+
+		radio_wait_free();
+		radio_send_packet_raw(spi_parms, foo, 16);
+
+		fprintf(stderr, "send done\n\n");
+
+		//radio_wait_a_bit(1);
+		usleep(1000 * 100);
+	}
+}
+
+
 // ------------------------------------------------------------------------------------------------
 int main (int argc, char **argv)
 // ------------------------------------------------------------------------------------------------
@@ -551,6 +615,14 @@ int main (int argc, char **argv)
     else if (arguments.test_mode == TEST_RX_ECHO)
     {
         radio_test_echo(&spi_parameters, &radio_parameters, &arguments, 0);
+    }
+    else if (arguments.test_mode == 7)
+    {
+        stdout_print(&spi_parameters, &radio_parameters, &arguments);
+    }
+    else if (arguments.test_mode == 8)
+    {
+		send_raw_pkt_test(&spi_parameters, &radio_parameters, &arguments);
     }
 
     delete_args(&arguments);

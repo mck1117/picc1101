@@ -1213,3 +1213,56 @@ void radio_send_packet(spi_parms_t *spi_parms, arguments_t *arguments, uint8_t *
 
     packets_sent++;
 }
+
+void radio_send_packet_raw(spi_parms_t* spi_parms, uint8_t* packet, uint8_t size)
+{
+    // Set number of bytes to tx
+	radio_int_data.tx_count = size;
+
+    // Copy to tx buffer
+	memcpy((uint8_t*)radio_int_data.tx_buf, packet, size);
+
+    // Setup radio
+	radio_int_data.mode = RADIOMODE_TX;
+    radio_int_data.packet_send = 0;
+    radio_int_data.threshold_hits = 0;
+
+    radio_set_packet_length(spi_parms, radio_int_data.tx_count);
+
+    PI_CC_SPIWriteReg(spi_parms, PI_CCxxx0_IOCFG2,   0x02); // GDO2 output pin config TX mode
+
+    // Initial number of bytes to put in FIFO is either the number of bytes to send or the FIFO size whichever is
+    // the smallest. Actual size blocks you need to take size minus one byte.
+    uint8_t initial_tx_count = (radio_int_data.tx_count > PI_CCxxx0_FIFO_SIZE-1 ? PI_CCxxx0_FIFO_SIZE-1 : radio_int_data.tx_count);
+
+    // Initial fill of TX FIFO
+    PI_CC_SPIWriteBurstReg(spi_parms, PI_CCxxx0_TXFIFO, (uint8_t *) radio_int_data.tx_buf, initial_tx_count);
+    radio_int_data.byte_index = initial_tx_count;
+    radio_int_data.bytes_remaining = radio_int_data.tx_count - initial_tx_count;
+    blocks_sent = radio_int_data.packet_tx_count;
+
+    PI_CC_SPIStrobe(spi_parms, PI_CCxxx0_STX); // Kick-off Tx
+
+
+    print_block(4, (uint8_t *) radio_int_data.tx_buf, radio_int_data.tx_count);
+
+    blocks_sent = radio_int_data.packet_tx_count;
+    verbprintf(2,"Tx: packet length %d, FIFO threshold was hit %d times\n", radio_int_data.tx_count, radio_int_data.threshold_hits);
+}
+
+uint8_t radio_receive_packet_raw(spi_parms_t* spi_parms, uint8_t* packet)
+{
+	// return 0 if no packets rx'd
+	if (blocks_received == radio_int_data.packet_rx_count)
+	{
+		return 0;
+	}
+
+	print_received_packet(3);
+
+	uint8_t actual_bytes = radio_int_data.rx_count;
+
+	memcpy(packet, (uint8_t*)radio_int_data.rx_buf, actual_bytes);
+
+	return actual_bytes;
+}
