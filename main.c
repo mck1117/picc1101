@@ -478,7 +478,7 @@ void stdout_print(spi_parms_t* spi_parms, radio_parms_t* radio_parms, arguments_
 
 	while (1)
 	{
-		radio_init_rx(spi_parms, arguments);
+		radio_init_rx(spi_parms, arguments, 16);
 		radio_turn_rx(spi_parms);
 
 		do
