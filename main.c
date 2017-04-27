@@ -422,36 +422,6 @@ static error_t parse_opt (int key, char *arg, struct argp_state *state)
         case 'w':
             arguments->rate_skew = atof(arg);
             break;
-        // KISS TNC serial link window
-        case 300:
-            arguments->tnc_serial_window = strtol(arg, &end, 10);
-            if (*end)
-                argp_usage(state);
-            break; 
-        // KISS TNC radio link window
-        case 301:
-            arguments->tnc_radio_window = strtol(arg, &end, 10);
-            if (*end)
-                argp_usage(state);
-            break; 
-        // KISS TNC keyup delay
-        case 302:
-            arguments->tnc_keyup_delay = strtol(arg, &end, 10);
-            if (*end)
-                argp_usage(state);
-            break; 
-        // KISS TNC keydown delay
-        case 303:
-            arguments->tnc_keydown_delay = strtol(arg, &end, 10);
-            if (*end)
-                argp_usage(state);
-            break; 
-        // KISS TNC switchover delay 
-        case 304:
-            arguments->tnc_switchover_delay = strtol(arg, &end, 10);
-            if (*end)
-                argp_usage(state);
-            break; 
         default:
             return ARGP_ERR_UNKNOWN;
     }
