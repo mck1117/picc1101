@@ -18,7 +18,6 @@
 #include "serial.h"
 #include "pi_cc_spi.h"
 #include "radio.h"
-#include "kiss.h"
 
 arguments_t   arguments;
 serial_t      serial_parameters;
@@ -580,11 +579,6 @@ int main (int argc, char **argv)
     else if (arguments.test_mode == TEST_RX_ECHO)
     {
         radio_test_echo(&spi_parameters, &radio_parameters, &arguments, 0);
-    }
-    else
-    {
-        kiss_init(&arguments);
-        kiss_run(&serial_parameters, &spi_parameters, &arguments);    
     }
 
     delete_args(&arguments);
